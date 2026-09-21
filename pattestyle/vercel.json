@@ -1,0 +1,3 @@
+{
+  "$comment": "Ne mets aucune valeur secrète ici. Toutes les variables d'environnement (Supabase, Google, ADMIN_ACCESS_CODE, ADMIN_TOKEN_SECRET) doivent être configurées dans Vercel > Project Settings > Environment Variables. Voir DEPLOIEMENT.md."
+}
