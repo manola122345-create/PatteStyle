@@ -1,9 +1,13 @@
 # Déploiement PatteStyle — checklist
 
+## 0. Configurer Supabase (si ce n'est pas déjà fait)
+- [ ] Crée un compte/projet sur [supabase.com](https://supabase.com) (gratuit pour démarrer).
+- [ ] Dans ton nouveau projet, va dans **SQL Editor** > **New query**, colle le contenu du fichier `supabase/schema.sql` fourni dans ce projet, puis exécute (Run). Ça crée les tables `products`, `orders`, `customers`, `reviews`, `store_settings`.
+- [ ] Va dans **Project Settings > API** : note l'**URL du projet** et la **clé `anon` (public)** et la **clé `service_role` (secret)** — tu en auras besoin à l'étape 2.
+
 ## 1. Avant de pousser sur GitHub
 - [ ] Vérifie qu'aucun fichier `.env`, `.env.local` n'est suivi par git (ils sont dans `.gitignore`).
 - [ ] `vercel.json` ne contient plus aucune valeur secrète (c'est fait).
-- [ ] Recommandé : régénère la clé `service_role` de ton projet Supabase (Dashboard Supabase > Project Settings > API > Reset service_role secret), car l'ancienne a circulé en clair dans un fichier exporté. Une fois régénérée, mets la nouvelle valeur uniquement dans Vercel (voir étape 2).
 
 ## 2. Variables d'environnement à configurer dans Vercel
 Vercel > ton projet > Settings > Environment Variables. Ajoute (Production + Preview + Development) :
