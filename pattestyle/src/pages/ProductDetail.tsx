@@ -4,7 +4,6 @@ import {
   Star, 
   Truck, 
   ShieldCheck, 
-  RotateCcw, 
   ShoppingBag, 
   Check, 
   Sparkles, 
@@ -360,7 +359,7 @@ const ProductDetail: React.FC = () => {
               <span>Estimé de Livraison Europe :</span>
             </div>
             <p className="text-xs text-stone-600">
-              {product.delivery_estimate || '📦 Expédition gratuite sous 24/48h • Réception sous 3 à 5 jours ouvrés en Europe (Colissimo / Chronopost).'}
+              {product.delivery_estimate || 'Livraison sous 1 à 7 jours ouvrables en Europe (Colissimo / Chronopost).'}
             </p>
           </div>
 
@@ -371,8 +370,8 @@ const ProductDetail: React.FC = () => {
               <span>Paiement Sécurisé</span>
             </div>
             <div className="space-y-1">
-              <RotateCcw className="w-4 h-4 text-amber-600 mx-auto" />
-              <span>Retours 30 Jours</span>
+              <Truck className="w-4 h-4 text-amber-600 mx-auto" />
+              <span>Livraison 1-7 jours</span>
             </div>
             <div className="space-y-1">
               <Heart className="w-4 h-4 text-red-500 mx-auto" />

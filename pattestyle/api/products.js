@@ -85,7 +85,7 @@ export default async function handler(req, res) {
           is_active: is_active !== undefined ? is_active : true,
           is_featured: !!is_featured,
           is_best_seller: !!is_best_seller,
-          delivery_estimate: delivery_estimate || 'Livraison 48h - 72h en Europe',
+          delivery_estimate: delivery_estimate || 'Livraison 1 à 7 jours ouvrables en Europe',
           badge: badge || null
         }])
         .select()

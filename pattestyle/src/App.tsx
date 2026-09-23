@@ -7,7 +7,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import AdminPinModal from './components/AdminPinModal';
-import PixelTrackerOverlay from './components/PixelTrackerOverlay';
 
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
@@ -29,7 +28,6 @@ const App: React.FC = () => {
             <Header />
             <CartDrawer />
             <AdminPinModal />
-            <PixelTrackerOverlay />
 
             <main className="flex-1">
               <Routes>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PawPrint, ShieldCheck, Truck, RotateCcw, Heart, Mail } from 'lucide-react';
+import { PawPrint, ShieldCheck, Truck, Lock, Heart } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -13,9 +13,9 @@ const Footer: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-amber-900/40 text-amber-400 flex items-center justify-center mb-2">
               <Truck className="w-6 h-6" />
             </div>
-            <h4 className="font-semibold text-white">Livraison Europe Express</h4>
+            <h4 className="font-semibold text-white">Livraison Europe</h4>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Expédition sous 24h/48h avec numéro de suivi pour toute l'Europe (France, Belgique, Suisse, etc.).
+              Livraison sous 1 à 7 jours ouvrables avec numéro de suivi, partout en Europe (France, Belgique, Suisse, etc.).
             </p>
           </div>
 
@@ -31,11 +31,11 @@ const Footer: React.FC = () => {
 
           <div className="flex flex-col items-center md:items-start space-y-2">
             <div className="w-12 h-12 rounded-xl bg-amber-900/40 text-amber-400 flex items-center justify-center mb-2">
-              <RotateCcw className="w-6 h-6" />
+              <Lock className="w-6 h-6" />
             </div>
-            <h4 className="font-semibold text-white">30 Jours Satisfait ou Remboursé</h4>
+            <h4 className="font-semibold text-white">Paiement 100% Sécurisé</h4>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Essayez à la maison tranquillement. Retour simple et remboursement rapide en cas d'insatisfaction.
+              Paiement par carte bancaire crypté et traité directement par Stripe.
             </p>
           </div>
 

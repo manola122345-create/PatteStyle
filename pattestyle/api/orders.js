@@ -36,6 +36,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
+      // La création de commande publique passe maintenant par
+      // /api/create-checkout-session (Stripe) + /api/stripe-webhook.
+      // Cette route ne sert plus qu'à un usage admin exceptionnel.
+      if (!requireAdmin(req, res)) return;
       const {
         customer_name,
         customer_email,

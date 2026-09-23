@@ -1,30 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, Package, Truck, Printer, ArrowRight, PawPrint } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
+import { trackEvent } from '../lib/tracking';
 
 const OrderConfirmation: React.FC = () => {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order_number') || 'PS-2026-8942';
+  const { clearCart } = useCart();
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOrder = async () => {
+    let cancelled = false;
+    let tracked = false;
+
+    const fetchOrder = async (retry = true) => {
       try {
         const res = await fetch(`/api/orders?order_number=${orderNumber}`);
         const data = await res.json();
+        if (cancelled) return;
+
         if (data && !data.error) {
           setOrder(data);
+
+          // Le webhook Stripe peut prendre 1-2s à confirmer le paiement.
+          if (data.status === 'En attente de paiement' && retry) {
+            setTimeout(() => fetchOrder(false), 2500);
+            return;
+          }
+
+          if (!tracked) {
+            clearCart();
+            trackEvent('Purchase', {
+              order_number: data.order_number,
+              total: data.total,
+              currency: 'EUR'
+            });
+            tracked = true;
+          }
         }
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchOrder();
+    return () => { cancelled = true; };
   }, [orderNumber]);
 
   return (

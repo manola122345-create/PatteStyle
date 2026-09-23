@@ -17,7 +17,7 @@ create table if not exists products (
   is_active boolean default true,
   is_featured boolean default false,
   is_best_seller boolean default false,
-  delivery_estimate text default 'Livraison 48h - 72h en Europe',
+  delivery_estimate text default 'Livraison 1 à 7 jours ouvrables en Europe',
   badge text,
   created_at timestamptz default now()
 );
@@ -84,3 +84,15 @@ alter table customers enable row level security;
 alter table orders enable row level security;
 alter table reviews enable row level security;
 alter table store_settings enable row level security;
+
+-- Bucket de stockage pour les photos produits, uploadées depuis l'admin.
+-- Public en lecture (pour que les images s'affichent sur le site),
+-- mais l'upload/suppression ne se fait que via la clé service_role côté serveur.
+insert into storage.buckets (id, name, public)
+values ('product-images', 'product-images', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public read product images" on storage.objects;
+create policy "Public read product images"
+  on storage.objects for select
+  using (bucket_id = 'product-images');

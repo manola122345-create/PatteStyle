@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   PawPrint, 
-  Sparkles, 
   ArrowRight, 
   Truck, 
   ShieldCheck, 
-  RotateCcw, 
   Star, 
   Clock, 
   ChevronRight,
   Heart,
-  Flame,
   TrendingUp,
   CheckCircle2
 } from 'lucide-react';
@@ -22,9 +19,6 @@ const Home: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [bestSellers, setBestSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Countdown timer for Flash Sale
-  const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 32, seconds: 45 });
 
   useEffect(() => {
     trackEvent('ViewContent', { page: 'Homepage' });
@@ -45,17 +39,6 @@ const Home: React.FC = () => {
     };
 
     fetchProducts();
-
-    const interval = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59 };
-        if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        return { hours: 24, minutes: 0, seconds: 0 };
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -68,11 +51,6 @@ const Home: React.FC = () => {
             
             {/* Left Column Text */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-amber-200/60 text-amber-950 text-xs font-bold px-3.5 py-1.5 rounded-full border border-amber-300 shadow-xs">
-                <Sparkles className="w-4 h-4 text-amber-700" />
-                <span>Collection Printemps 2026 • Expédition Europe 48h</span>
-              </div>
-
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight leading-[1.15]">
                 Le confort & l'élégance que votre <span className="text-amber-700 underline decoration-amber-300 decoration-wavy underline-offset-8">compagnon</span> mérite.
               </h1>
@@ -132,20 +110,6 @@ const Home: React.FC = () => {
                   alt="Lit orthopédique pour chien PatteStyle"
                   className="w-full h-full object-cover"
                 />
-                
-                {/* Floating promo badge overlay */}
-                <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-stone-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">Incontournable</span>
-                    <h4 className="font-bold text-stone-900 text-sm">Panier Orthopédique Cozy</h4>
-                    <p className="text-xs text-stone-500">Garnissage mémoire de forme</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-stone-400 line-through block">69,90 €</span>
-                    <span className="text-lg font-bold text-amber-800">49,90 €</span>
-                  </div>
-                </div>
-
               </div>
             </div>
 
@@ -224,50 +188,6 @@ const Home: React.FC = () => {
               <h3 className="font-bold text-lg leading-tight">Jouets & Éveil</h3>
             </div>
           </Link>
-        </div>
-      </section>
-
-      {/* Flash Sale Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-amber-900 via-stone-900 to-amber-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-          
-          <div className="space-y-3 max-w-xl text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/30">
-              <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span>Ventes Flash Europe - Jusqu'à -40%</span>
-            </div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold">
-              Offre à durée limitée sur les Best-Sellers
-            </h2>
-            <p className="text-stone-300 text-xs sm:text-sm">
-              Profitez des réductions exclusives de la semaine avant rupture définitive du stock Europe.
-            </p>
-          </div>
-
-          {/* Countdown timer */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="bg-stone-800/80 border border-stone-700 rounded-2xl p-3 text-center w-16">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-amber-400">
-                {String(timeLeft.hours).padStart(2, '0')}
-              </span>
-              <span className="text-[10px] text-stone-400 block uppercase">Heures</span>
-            </div>
-            <span className="text-amber-400 font-bold text-xl">:</span>
-            <div className="bg-stone-800/80 border border-stone-700 rounded-2xl p-3 text-center w-16">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-amber-400">
-                {String(timeLeft.minutes).padStart(2, '0')}
-              </span>
-              <span className="text-[10px] text-stone-400 block uppercase">Min</span>
-            </div>
-            <span className="text-amber-400 font-bold text-xl">:</span>
-            <div className="bg-stone-800/80 border border-stone-700 rounded-2xl p-3 text-center w-16">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-amber-400">
-                {String(timeLeft.seconds).padStart(2, '0')}
-              </span>
-              <span className="text-[10px] text-stone-400 block uppercase">Sec</span>
-            </div>
-          </div>
-
         </div>
       </section>
 

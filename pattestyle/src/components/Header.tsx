@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   ShoppingBag, 
   Search, 
   PawPrint, 
   ShieldCheck, 
-  Truck, 
-  RotateCcw, 
   Lock, 
   Menu, 
   X,
-  Sparkles,
   ChevronDown
 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -19,44 +16,12 @@ import SearchModal from './SearchModal';
 
 const Header: React.FC = () => {
   const { totalCount, setIsOpen: setIsCartOpen } = useCart();
-  const { isAdmin, setShowAdminPinModal, logoutAdmin } = useAdmin();
+  const { isAdmin } = useAdmin();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs border-b border-amber-900/10">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-amber-800 via-amber-700 to-amber-900 text-amber-50 text-xs py-2 px-4 font-medium">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-center">
-          <div className="hidden sm:flex items-center gap-4 text-amber-100/90 text-[11px]">
-            <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-amber-300" /> Express Europe (48-72h)</span>
-            <span className="flex items-center gap-1.5"><RotateCcw className="w-3.5 h-3.5 text-amber-300" /> 30 jours pour tester</span>
-          </div>
-          <div className="w-full sm:w-auto font-semibold flex items-center justify-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            <span>Offre de Bienvenue : <strong>-10%</strong> avec le code <span className="bg-amber-950/40 px-2 py-0.5 rounded text-amber-200 border border-amber-600/30">PATTE10</span></span>
-          </div>
-          <div className="hidden md:flex items-center gap-2">
-            {isAdmin ? (
-              <button 
-                onClick={() => navigate('/admin')}
-                className="bg-emerald-500 text-white font-bold px-2.5 py-0.5 rounded text-[10px] tracking-wide flex items-center gap-1 hover:bg-emerald-600 transition"
-              >
-                <Lock className="w-3 h-3" /> Mode Admin Actif
-              </button>
-            ) : (
-              <button 
-                onClick={() => setShowAdminPinModal(true)}
-                className="text-amber-200 hover:text-white text-[11px] underline flex items-center gap-1"
-              >
-                Accès Gérant Back-Office
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Main Header Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -184,8 +149,8 @@ const Header: React.FC = () => {
           >
             Contact & Support
           </Link>
-          <div className="pt-3 border-t border-stone-200">
-            {isAdmin ? (
+          {isAdmin && (
+            <div className="pt-3 border-t border-stone-200">
               <Link 
                 to="/admin" 
                 onClick={() => setMobileMenuOpen(false)}
@@ -193,15 +158,8 @@ const Header: React.FC = () => {
               >
                 Tableau de Bord Admin
               </Link>
-            ) : (
-              <button 
-                onClick={() => { setMobileMenuOpen(false); setShowAdminPinModal(true); }}
-                className="w-full py-2.5 bg-stone-900 text-white rounded-xl font-medium text-center text-sm"
-              >
-                Accès Administrateur (PIN: 1234)
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

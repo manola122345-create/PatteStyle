@@ -19,7 +19,23 @@ Vercel > ton projet > Settings > Environment Variables. Ajoute (Production + Pre
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase > Project Settings > API (clé secrète — jamais côté client) |
 | `ADMIN_ACCESS_CODE` | Choisis un code d'accès admin fort, connu de toi seul |
 | `ADMIN_TOKEN_SECRET` | Une chaîne longue et aléatoire (ex: générée avec `openssl rand -hex 32`) |
+| `STRIPE_SECRET_KEY` | Dashboard Stripe > Développeurs > Clés API (clé secrète, `sk_live_...` ou `sk_test_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Voir étape 2bis ci-dessous |
+| `RESEND_API_KEY` | Compte sur resend.com (gratuit) > API Keys > créer une clé |
+| `ORDER_NOTIFICATION_EMAIL` | `shoppattes@gmail.com` (reçoit un email à chaque commande payée) |
+| `CONTACT_EMAIL` | `shoppattes@gmail.com` (reçoit les messages du formulaire de contact) |
 | `VITE_GOOGLE_CLIENT_ID` / `VITE_GOOGLE_AUTH_PROXY` | Si l'auth Google est utilisée |
+
+## 2bis. Configurer le webhook Stripe (obligatoire pour que les commandes se confirment)
+1. Déploie une première fois le site (les autres variables suffisent pour que le build passe).
+2. Va sur le [Dashboard Stripe](https://dashboard.stripe.com) > Développeurs > Webhooks > "Add endpoint".
+3. URL de l'endpoint : `https://<ton-domaine-vercel>.vercel.app/api/stripe-webhook`
+4. Événement à écouter : `checkout.session.completed`
+5. Une fois créé, Stripe affiche un "Signing secret" (commence par `whsec_...`) : copie-le dans la variable `STRIPE_WEBHOOK_SECRET` sur Vercel, puis redéploie.
+
+Sans cette étape, le paiement fonctionnera mais les commandes resteront bloquées en "En attente de paiement" et aucun email de notification ne partira.
+
+**Note Resend** : sans domaine vérifié, l'adresse d'envoi par défaut `onboarding@resend.dev` ne peut envoyer que vers l'adresse email avec laquelle tu t'es inscrit sur Resend. Si `shoppattes@gmail.com` n'est pas cette adresse, inscris-toi sur Resend avec `shoppattes@gmail.com`, ou vérifie un nom de domaine dans Resend (Domains > Add Domain) et utilise une adresse `@tondomaine.com` dans `ORDER_NOTIFICATION_FROM`.
 
 ## 3. Pousser sur GitHub
 ```

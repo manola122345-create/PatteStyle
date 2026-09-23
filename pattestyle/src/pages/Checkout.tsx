@@ -44,9 +44,6 @@ const Checkout: React.FC = () => {
   const [country, setCountry] = useState('France');
 
   const [paymentMethod, setPaymentMethod] = useState('Stripe CB');
-  const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
-  const [cardExp, setCardExp] = useState('12/28');
-  const [cardCvc, setCardCvc] = useState('123');
 
   useEffect(() => {
     trackEvent('InitiateCheckout', {
@@ -77,37 +74,31 @@ const Checkout: React.FC = () => {
       },
       shipping_zone: selectedCountryObj.name,
       shipping_fee: shippingFee,
-      items: cart,
-      subtotal,
-      total: grandTotal,
-      payment_method: paymentMethod
+      items: cart
     };
 
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)
       });
 
-      if (res.ok) {
-        const createdOrder = await res.json();
-        
-        trackEvent('Purchase', {
-          order_number: createdOrder.order_number,
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        trackEvent('InitiatePayment', {
           total: grandTotal,
           currency: 'EUR'
         });
-
-        clearCart();
-        navigate(`/order-confirmation?order_number=${createdOrder.order_number}`);
+        window.location.href = data.url;
       } else {
-        alert('Erreur lors de la création de la commande. Veuillez réessayer.');
+        alert(data.error || 'Erreur lors de la création du paiement. Veuillez réessayer.');
+        setSubmitting(false);
       }
     } catch (err) {
       console.error(err);
       alert('Erreur réseau');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -274,49 +265,19 @@ const Checkout: React.FC = () => {
                 </button>
               </div>
 
-              {/* Stripe Payment Preview Box */}
+              {/* Stripe Checkout Redirect */}
               <div className="space-y-4">
-                <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl space-y-3">
-                  <div className="flex items-center justify-between text-xs font-bold text-stone-800">
-                    <span>Carte Bancaire (Visa, Mastercard, Amex)</span>
-                    <Lock className="w-4 h-4 text-emerald-600" />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] text-stone-500 mb-1">Numéro de carte</label>
-                    <input
-                      type="text"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[11px] text-stone-500 mb-1">Expire le</label>
-                      <input
-                        type="text"
-                        value={cardExp}
-                        onChange={(e) => setCardExp(e.target.value)}
-                        className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-center"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] text-stone-500 mb-1">CVC / CVV</label>
-                      <input
-                        type="text"
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value)}
-                        className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-center"
-                      />
-                    </div>
-                  </div>
+                <div className="bg-stone-50 border border-stone-200 p-5 rounded-2xl space-y-2 text-center">
+                  <Lock className="w-6 h-6 text-emerald-600 mx-auto" />
+                  <p className="text-sm font-bold text-stone-800">Paiement 100% sécurisé par Stripe</p>
+                  <p className="text-xs text-stone-500">
+                    En cliquant sur "Payer", tu seras redirigé vers la page de paiement sécurisée Stripe pour entrer ta carte bancaire (Visa, Mastercard, Amex).
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2 text-[11px] text-stone-500 bg-amber-50 p-3 rounded-xl border border-amber-100">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Vos données sont cryptées en SSL 256 bits via l'infrastructure sécurisée Stripe.</span>
+                  <span>Vos données bancaires sont cryptées et traitées directement par Stripe — jamais stockées sur notre site.</span>
                 </div>
               </div>
 
@@ -326,9 +287,9 @@ const Checkout: React.FC = () => {
                 className="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-amber-700/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {submitting ? (
-                  <span>Traitement de la commande...</span>
+                  <span>Redirection vers Stripe...</span>
                 ) : (
-                  <span>Valider & Payer ({grandTotal.toFixed(2)} €)</span>
+                  <span>Payer {grandTotal.toFixed(2)} € en toute sécurité</span>
                 )}
               </button>
             </div>
@@ -385,7 +346,7 @@ const Checkout: React.FC = () => {
 
             <div className="p-3 bg-white rounded-xl border border-stone-200 text-[11px] text-stone-600 space-y-1">
               <span className="font-bold text-stone-900 block">🚚 Informations d'expédition :</span>
-              <p>Livré par Colissimo / Chronopost Europe sous 3 à 5 jours ouvrés.</p>
+              <p>Livré par Colissimo / Chronopost Europe sous 1 à 7 jours ouvrables.</p>
             </div>
           </div>
         </div>

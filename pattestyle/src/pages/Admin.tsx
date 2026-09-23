@@ -43,6 +43,44 @@ const Admin: React.FC = () => {
   const [pImageUrl, setPImageUrl] = useState('/images/dog-bed-1.jpg');
   const [pBadge, setPBadge] = useState('');
   const [pIsFeatured, setPIsFeatured] = useState(true);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  const handleImageFileSelect = async (file: File) => {
+    setUploadError('');
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Le fichier doit être une image.');
+      return;
+    }
+    if (file.size > 6 * 1024 * 1024) {
+      setUploadError('Image trop lourde (max 6 Mo).');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const dataUrl: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch('/api/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ filename: file.name, dataUrl })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Échec de l'upload");
+
+      setPImageUrl(data.url);
+    } catch (err: any) {
+      setUploadError(err.message || "Échec de l'upload de l'image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   // Order Details Modal
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -663,13 +701,33 @@ const Admin: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">URL Image Principale</label>
-                <input
-                  type="text"
-                  value={pImageUrl}
-                  onChange={(e) => setPImageUrl(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2"
-                />
+                <label className="block font-semibold text-stone-700 mb-1">Image du produit</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-xl bg-stone-100 border border-stone-300 overflow-hidden shrink-0">
+                    {pImageUrl && (
+                      <img src={pImageUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label className="inline-flex items-center gap-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl cursor-pointer transition">
+                      {uploadingImage ? 'Envoi en cours...' : 'Choisir une image'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingImage}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageFileSelect(file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                    {uploadError && (
+                      <p className="text-xs text-red-600 font-medium mt-1.5">{uploadError}</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>
