@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     const productIds = [...new Set(items.map((i) => i.product_id))];
     const { data: dbProducts, error: prodErr } = await supabase
       .from('products')
-      .select('id, title, price, images')
+      .select('id, title, price, images, supplier_url')
       .in('id', productIds);
     if (prodErr) throw prodErr;
 
@@ -70,7 +70,8 @@ export default async function handler(req, res) {
         quantity: qty,
         selectedSize: item.selectedSize || null,
         selectedColor: item.selectedColor || null,
-        image: Array.isArray(p.images) && p.images[0] ? p.images[0] : item.image || null
+        image: Array.isArray(p.images) && p.images[0] ? p.images[0] : item.image || null,
+        supplier_url: p.supplier_url || null
       });
     }
 

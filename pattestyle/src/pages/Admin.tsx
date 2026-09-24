@@ -40,46 +40,57 @@ const Admin: React.FC = () => {
   const [pCategory, setPCategory] = useState('Couchage & Repos');
   const [pPetType, setPPetType] = useState('Chien');
   const [pStock, setPStock] = useState('15');
-  const [pImageUrl, setPImageUrl] = useState('/images/dog-bed-1.jpg');
+  const [pImages, setPImages] = useState<string[]>(['/images/dog-bed-1.jpg']);
   const [pBadge, setPBadge] = useState('');
+  const [pSupplierUrl, setPSupplierUrl] = useState('');
+  const [pSpecifications, setPSpecifications] = useState('');
+  const [pColors, setPColors] = useState('');
+  const [pSizes, setPSizes] = useState('');
   const [pIsFeatured, setPIsFeatured] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  const handleImageFileSelect = async (file: File) => {
+  const handleImageFilesSelect = async (files: FileList) => {
     setUploadError('');
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Le fichier doit être une image.');
-      return;
-    }
-    if (file.size > 6 * 1024 * 1024) {
-      setUploadError('Image trop lourde (max 6 Mo).');
-      return;
-    }
-
     setUploadingImage(true);
-    try {
-      const dataUrl: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
 
-      const res = await fetch('/api/upload-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
-        body: JSON.stringify({ filename: file.name, dataUrl })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Échec de l'upload");
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) {
+        setUploadError('Le fichier doit être une image.');
+        continue;
+      }
+      if (file.size > 6 * 1024 * 1024) {
+        setUploadError('Image trop lourde (max 6 Mo).');
+        continue;
+      }
 
-      setPImageUrl(data.url);
-    } catch (err: any) {
-      setUploadError(err.message || "Échec de l'upload de l'image");
-    } finally {
-      setUploadingImage(false);
+      try {
+        const dataUrl: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const res = await fetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+          body: JSON.stringify({ filename: file.name, dataUrl })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Échec de l'upload");
+
+        setPImages((prev) => [...prev, data.url]);
+      } catch (err: any) {
+        setUploadError(err.message || "Échec de l'upload de l'image");
+      }
     }
+
+    setUploadingImage(false);
+  };
+
+  const removeImageAt = (idx: number) => {
+    setPImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   // Order Details Modal
@@ -145,6 +156,20 @@ const Admin: React.FC = () => {
   const totalOrders = orders.length;
   const avgBasket = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
+  const buildVariants = () => {
+    const colors = pColors.split(',').map((c) => c.trim()).filter(Boolean);
+    const sizes = pSizes.split(',').map((s) => s.trim()).filter(Boolean);
+
+    if (colors.length > 0 && sizes.length > 0) {
+      const combos: { color: string; size: string }[] = [];
+      colors.forEach((color) => sizes.forEach((size) => combos.push({ color, size })));
+      return combos;
+    }
+    if (colors.length > 0) return colors.map((color) => ({ color }));
+    if (sizes.length > 0) return sizes.map((size) => ({ size }));
+    return [];
+  };
+
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
@@ -156,8 +181,11 @@ const Admin: React.FC = () => {
       category: pCategory,
       pet_type: pPetType,
       stock_quantity: parseInt(pStock, 10),
-      images: [pImageUrl],
+      images: pImages.length > 0 ? pImages : ['/images/dog-bed-1.jpg'],
       badge: pBadge || null,
+      supplier_url: pSupplierUrl || null,
+      specifications: pSpecifications || '',
+      variants: buildVariants(),
       is_featured: pIsFeatured
     };
 
@@ -225,8 +253,12 @@ const Admin: React.FC = () => {
     setPCategory('Couchage & Repos');
     setPPetType('Chien');
     setPStock('15');
-    setPImageUrl('/images/dog-bed-1.jpg');
+    setPImages(['/images/dog-bed-1.jpg']);
     setPBadge('');
+    setPSupplierUrl('');
+    setPSpecifications('');
+    setPColors('');
+    setPSizes('');
     setPIsFeatured(true);
   };
 
@@ -240,8 +272,14 @@ const Admin: React.FC = () => {
     setPCategory(prod.category || 'Couchage & Repos');
     setPPetType(prod.pet_type || 'Chien');
     setPStock(prod.stock_quantity?.toString() || '15');
-    setPImageUrl(Array.isArray(prod.images) ? prod.images[0] : prod.image || '/images/dog-bed-1.jpg');
+    setPImages(Array.isArray(prod.images) && prod.images.length > 0 ? prod.images : ['/images/dog-bed-1.jpg']);
     setPBadge(prod.badge || '');
+    setPSupplierUrl(prod.supplier_url || '');
+    setPSpecifications(prod.specifications || '');
+    const variantColors = Array.from(new Set((prod.variants || []).map((v: any) => v.color).filter(Boolean)));
+    const variantSizes = Array.from(new Set((prod.variants || []).map((v: any) => v.size).filter(Boolean)));
+    setPColors(variantColors.join(', '));
+    setPSizes(variantSizes.join(', '));
     setPIsFeatured(!!prod.is_featured);
     setShowProductModal(true);
   };
@@ -701,33 +739,101 @@ const Admin: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Image du produit</label>
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-xl bg-stone-100 border border-stone-300 overflow-hidden shrink-0">
-                    {pImageUrl && (
-                      <img src={pImageUrl} alt="Aperçu" className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <label className="inline-flex items-center gap-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl cursor-pointer transition">
-                      {uploadingImage ? 'Envoi en cours...' : 'Choisir une image'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={uploadingImage}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleImageFileSelect(file);
-                          e.target.value = '';
-                        }}
-                      />
-                    </label>
-                    {uploadError && (
-                      <p className="text-xs text-red-600 font-medium mt-1.5">{uploadError}</p>
-                    )}
-                  </div>
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Lien produit fournisseur (AliExpress)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://www.aliexpress.com/item/..."
+                  value={pSupplierUrl}
+                  onChange={(e) => setPSupplierUrl(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2"
+                />
+                <p className="text-[11px] text-stone-400 mt-1">
+                  Usage interne uniquement — jamais visible par les clients. Apparaît sur chaque commande pour passer la commande fournisseur rapidement.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Images du produit</label>
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {pImages.map((img, idx) => (
+                    <div key={idx} className="relative w-20 h-20 rounded-xl bg-stone-100 border border-stone-300 overflow-hidden shrink-0 group">
+                      <img src={img} alt={`Aperçu ${idx + 1}`} className="w-full h-full object-cover" />
+                      {idx === 0 && (
+                        <span className="absolute bottom-0 inset-x-0 bg-amber-700 text-white text-[9px] font-bold text-center py-0.5">
+                          Principale
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeImageAt(idx)}
+                        className="absolute top-1 right-1 bg-stone-900/70 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
+                <label className="inline-flex items-center gap-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl cursor-pointer transition">
+                  {uploadingImage ? 'Envoi en cours...' : '+ Ajouter des images'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    disabled={uploadingImage}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) handleImageFilesSelect(e.target.files);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
+                <p className="text-[11px] text-stone-400 mt-1.5">
+                  La première image est utilisée comme image principale du produit. Les clients pourront naviguer entre toutes les images sur la fiche produit.
+                </p>
+                {uploadError && (
+                  <p className="text-xs text-red-600 font-medium mt-1.5">{uploadError}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Couleurs disponibles</label>
+                  <input
+                    type="text"
+                    placeholder="ex: Beige, Gris, Marron"
+                    value={pColors}
+                    onChange={(e) => setPColors(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1">Séparées par des virgules. Laisse vide si pas de choix de couleur.</p>
+                </div>
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Tailles disponibles</label>
+                  <input
+                    type="text"
+                    placeholder="ex: S, M, L"
+                    value={pSizes}
+                    onChange={(e) => setPSizes(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1">Séparées par des virgules. Laisse vide si pas de choix de taille.</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Conseils & Spécifications</label>
+                <textarea
+                  rows={4}
+                  placeholder="ex: Entretien : lavable en machine à 30°C.&#10;Matériaux : tissu Oxford haute densité, mousse à mémoire de forme."
+                  value={pSpecifications}
+                  onChange={(e) => setPSpecifications(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 rounded-xl p-3"
+                />
+                <p className="text-[11px] text-stone-400 mt-1">
+                  Affiché dans l'onglet "Conseils & Spécifications" de la fiche produit. Laisse vide pour garder le texte générique par défaut.
+                </p>
               </div>
 
               <div>
@@ -777,11 +883,25 @@ const Admin: React.FC = () => {
 
             <div className="border-t pt-2">
               <strong className="block mb-1">Articles :</strong>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {Array.isArray(selectedOrder.items) && selectedOrder.items.map((it: any, idx: number) => (
-                  <div key={idx} className="flex justify-between">
-                    <span>{it.quantity}x {it.title}</span>
-                    <span className="font-bold">{(it.price * it.quantity).toFixed(2)} €</span>
+                  <div key={idx} className="flex justify-between items-center gap-2 bg-stone-50 rounded-lg px-2 py-1.5">
+                    <div>
+                      <span className="block">{it.quantity}x {it.title}</span>
+                      {it.supplier_url ? (
+                        <a
+                          href={it.supplier_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-amber-700 underline text-[11px] font-semibold"
+                        >
+                          Commander chez le fournisseur →
+                        </a>
+                      ) : (
+                        <span className="text-stone-400 text-[11px]">Pas de lien fournisseur renseigné</span>
+                      )}
+                    </div>
+                    <span className="font-bold whitespace-nowrap">{(it.price * it.quantity).toFixed(2)} €</span>
                   </div>
                 ))}
               </div>

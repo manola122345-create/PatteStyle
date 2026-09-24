@@ -18,6 +18,8 @@ create table if not exists products (
   is_featured boolean default false,
   is_best_seller boolean default false,
   delivery_estimate text default 'Livraison 1 à 7 jours ouvrables en Europe',
+  supplier_url text,
+  specifications text default '',
   badge text,
   created_at timestamptz default now()
 );
@@ -73,6 +75,11 @@ create index if not exists idx_products_pet_type on products(pet_type);
 create index if not exists idx_orders_status on orders(status);
 create index if not exists idx_orders_order_number on orders(order_number);
 create index if not exists idx_reviews_product_id on reviews(product_id);
+
+-- Si tu avais déjà exécuté ce script avant l'ajout de supplier_url,
+-- cette ligne l'ajoute à une table products existante sans rien casser.
+alter table products add column if not exists supplier_url text;
+alter table products add column if not exists specifications text default '';
 
 -- Sécurité : le frontend n'accède jamais directement à Supabase (tout passe par
 -- les fonctions /api/* qui utilisent la clé service_role côté serveur).

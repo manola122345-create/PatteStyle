@@ -21,7 +21,7 @@ async function sendOrderNotificationEmail(order) {
   }
   const to = process.env.ORDER_NOTIFICATION_EMAIL || 'shoppattes@gmail.com';
   const itemsList = (order.items || [])
-    .map((i) => `- ${i.title} x${i.quantity} (${i.price} €)`)
+    .map((i) => `- ${i.title} x${i.quantity} (${i.price} €)${i.supplier_url ? `\n  Fournisseur : ${i.supplier_url}` : ''}`)
     .join('\n');
 
   const res = await fetch('https://api.resend.com/emails', {

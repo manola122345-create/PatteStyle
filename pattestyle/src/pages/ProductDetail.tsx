@@ -427,16 +427,22 @@ const ProductDetail: React.FC = () => {
 
           {activeTab === 'specifications' && (
             <div className="space-y-4 text-xs sm:text-sm text-stone-700">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
-                  <span className="font-bold text-stone-900 block mb-1">Entretien :</span>
-                  <span>Lavable en machine à 30°C ou au chiffon humide. Séchage rapide à l'air libre.</span>
+              {product.specifications ? (
+                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 whitespace-pre-line">
+                  {product.specifications}
                 </div>
-                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
-                  <span className="font-bold text-stone-900 block mb-1">Matériaux :</span>
-                  <span>Tissu Oxford haute densité, mousse à mémoire de forme, microfibre hypoallergénique.</span>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <span className="font-bold text-stone-900 block mb-1">Entretien :</span>
+                    <span>Lavable en machine à 30°C ou au chiffon humide. Séchage rapide à l'air libre.</span>
+                  </div>
+                  <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <span className="font-bold text-stone-900 block mb-1">Matériaux :</span>
+                    <span>Tissu Oxford haute densité, mousse à mémoire de forme, microfibre hypoallergénique.</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 

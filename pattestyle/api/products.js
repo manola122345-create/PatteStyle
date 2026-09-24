@@ -63,7 +63,9 @@ export default async function handler(req, res) {
         is_featured,
         is_best_seller,
         delivery_estimate,
-        badge
+        badge,
+        supplier_url,
+        specifications
       } = req.body;
 
       const slug = (title || 'produit').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -86,7 +88,9 @@ export default async function handler(req, res) {
           is_featured: !!is_featured,
           is_best_seller: !!is_best_seller,
           delivery_estimate: delivery_estimate || 'Livraison 1 à 7 jours ouvrables en Europe',
-          badge: badge || null
+          badge: badge || null,
+          supplier_url: supplier_url || null,
+          specifications: specifications || ''
         }])
         .select()
         .single();
