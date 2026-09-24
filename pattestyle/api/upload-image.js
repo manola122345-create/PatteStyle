@@ -48,13 +48,15 @@ export default async function handler(req, res) {
 
     if (uploadError) {
       console.error('Erreur upload Supabase Storage:', uploadError);
-      return res.status(500).json({ error: "Échec de l'upload. Vérifie que le bucket 'product-images' existe (voir supabase/schema.sql)." });
+      return res.status(500).json({
+        error: `Échec de l'upload (${uploadError.message || uploadError.error || 'raison inconnue'}). Vérifie que le bucket 'product-images' existe et est public.`
+      });
     }
 
     const { data } = supabase.storage.from('product-images').getPublicUrl(path);
     return res.status(200).json({ url: data.publicUrl });
   } catch (err) {
     console.error('API upload-image error:', err);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    return res.status(500).json({ error: `Erreur serveur : ${err.message || err}` });
   }
 }
