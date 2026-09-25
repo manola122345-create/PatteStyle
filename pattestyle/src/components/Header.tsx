@@ -46,9 +46,6 @@ const Header: React.FC = () => {
               <Link to="/catalog?pet=Chat" className="hover:text-amber-700 transition flex items-center gap-1">
                 🐱 Chats
               </Link>
-              <Link to="/catalog?category=Promotions" className="text-amber-700 font-semibold hover:text-amber-800 transition flex items-center gap-1">
-                🔥 Bons Plans
-              </Link>
             </nav>
           </div>
 

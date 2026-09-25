@@ -78,9 +78,9 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs text-stone-400">
               <li><Link to="/catalog?pet=Chien" className="hover:text-amber-400 transition">Accessoires Chiens</Link></li>
               <li><Link to="/catalog?pet=Chat" className="hover:text-amber-400 transition">Accessoires Chats</Link></li>
-              <li><Link to="/catalog?category=Couchage & Repos" className="hover:text-amber-400 transition">Couchage & Lit Orthopédique</Link></li>
-              <li><Link to="/catalog?category=Harnais & Laisses" className="hover:text-amber-400 transition">Harnais & Laisses</Link></li>
-              <li><Link to="/catalog?category=Jouets & Éveil" className="hover:text-amber-400 transition">Jouets Interactifs</Link></li>
+              <li><Link to={`/catalog?category=${encodeURIComponent('Couchage & Repos')}`} className="hover:text-amber-400 transition">Couchage & Lit Orthopédique</Link></li>
+              <li><Link to={`/catalog?category=${encodeURIComponent('Harnais & Laisses')}`} className="hover:text-amber-400 transition">Harnais & Laisses</Link></li>
+              <li><Link to={`/catalog?category=${encodeURIComponent('Jouets & Éveil')}`} className="hover:text-amber-400 transition">Jouets Interactifs</Link></li>
             </ul>
           </div>
 

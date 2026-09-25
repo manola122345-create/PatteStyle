@@ -130,7 +130,7 @@ const Home: React.FC = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
-            to="/catalog?category=Couchage & Repos"
+            to={`/catalog?category=${encodeURIComponent('Couchage & Repos')}`}
             className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
           >
             <img
@@ -145,7 +145,7 @@ const Home: React.FC = () => {
           </Link>
 
           <Link
-            to="/catalog?category=Harnais & Laisses"
+            to={`/catalog?category=${encodeURIComponent('Harnais & Laisses')}`}
             className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
           >
             <img
@@ -160,7 +160,7 @@ const Home: React.FC = () => {
           </Link>
 
           <Link
-            to="/catalog?category=Repas & Gamelles"
+            to={`/catalog?category=${encodeURIComponent('Repas & Gamelles')}`}
             className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
           >
             <img
@@ -175,7 +175,7 @@ const Home: React.FC = () => {
           </Link>
 
           <Link
-            to="/catalog?category=Jouets & Éveil"
+            to={`/catalog?category=${encodeURIComponent('Jouets & Éveil')}`}
             className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
           >
             <img

@@ -12,9 +12,7 @@ const Catalog: React.FC = () => {
   // Filter States
   const selectedPet = searchParams.get('pet') || 'Tous';
   const selectedCategory = searchParams.get('category') || 'Tous';
-  const [maxPrice, setMaxPrice] = useState<number>(100);
   const [sortBy, setSortBy] = useState<string>('newest');
-  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const categoriesList = [
@@ -52,8 +50,6 @@ const Catalog: React.FC = () => {
 
   // Filter & Sort Logic
   const filteredProducts = products.filter(product => {
-    if (product.price > maxPrice) return false;
-    if (inStockOnly && product.stock_quantity <= 0) return false;
     return true;
   }).sort((a, b) => {
     if (sortBy === 'price-asc') return a.price - b.price;
@@ -98,12 +94,10 @@ const Catalog: React.FC = () => {
             <h3 className="font-bold text-stone-900 text-base flex items-center gap-2">
               <Filter className="w-4 h-4 text-amber-700" /> Filtres
             </h3>
-            {(selectedPet !== 'Tous' || selectedCategory !== 'Tous' || maxPrice < 100) && (
+            {(selectedPet !== 'Tous' || selectedCategory !== 'Tous') && (
               <button 
                 onClick={() => {
                   setSearchParams({});
-                  setMaxPrice(100);
-                  setInStockOnly(false);
                 }}
                 className="text-[11px] font-semibold text-amber-700 hover:underline"
               >
@@ -157,36 +151,6 @@ const Catalog: React.FC = () => {
             </div>
           </div>
 
-          {/* Price Range Slider */}
-          <div className="space-y-2 pt-2 border-t border-stone-100">
-            <div className="flex justify-between text-xs font-bold">
-              <span className="text-stone-500">Prix Maximum</span>
-              <span className="text-amber-800">{maxPrice} €</span>
-            </div>
-            <input
-              type="range"
-              min="10"
-              max="150"
-              step="5"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-amber-700 cursor-pointer"
-            />
-          </div>
-
-          {/* Availability Toggle */}
-          <div className="pt-2 border-t border-stone-100">
-            <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-stone-700">
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={(e) => setInStockOnly(e.target.checked)}
-                className="rounded text-amber-700 focus:ring-amber-500 accent-amber-700 w-4 h-4"
-              />
-              <span>Uniquement en stock ({products.filter(p => p.stock_quantity > 0).length})</span>
-            </label>
-          </div>
-
         </div>
 
         {/* Product Grid Area */}
@@ -237,10 +201,10 @@ const Catalog: React.FC = () => {
               </div>
               <h3 className="font-bold text-stone-800">Aucun produit ne correspond à vos filtres</h3>
               <p className="text-xs text-stone-500 max-w-sm mx-auto">
-                Essayez d'élargir le prix maximum ou de réinitialiser la catégorie sélectionnée.
+                Essayez de réinitialiser la catégorie sélectionnée.
               </p>
               <button
-                onClick={() => { setSearchParams({}); setMaxPrice(100); }}
+                onClick={() => { setSearchParams({}); }}
                 className="bg-amber-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl"
               >
                 Voir tout le catalogue
