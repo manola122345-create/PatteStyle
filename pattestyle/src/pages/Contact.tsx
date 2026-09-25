@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Send, CheckCircle2 } from 'lucide-react';
+import Seo from '../components/Seo';
 
 const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -32,6 +33,11 @@ const Contact: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <Seo
+        title="Contact"
+        description="Contactez PatteStyle par email — nous répondons sous 24h pour toute question sur une commande ou un produit."
+        path="/contact"
+      />
       <div className="text-center max-w-xl mx-auto space-y-2">
         <h1 className="font-serif text-3xl font-bold text-stone-900">
           Contactez le Support PatteStyle

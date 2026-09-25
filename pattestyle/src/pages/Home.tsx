@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   PawPrint, 
   ArrowRight, 
@@ -43,6 +44,11 @@ const Home: React.FC = () => {
 
   return (
     <div className="space-y-16 pb-16">
+      <Seo
+        title="Accessoires Premium pour Chiens & Chats"
+        description="PatteStyle — accessoires premium pour chiens et chats en Europe : couchages orthopédiques, harnais, gamelles, jouets. Livraison 1 à 7 jours ouvrables."
+        path="/"
+      />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-amber-100/60 via-amber-50/30 to-white pt-10 pb-16 md:pt-16 md:pb-24 border-b border-amber-900/5 overflow-hidden">

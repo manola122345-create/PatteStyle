@@ -16,6 +16,7 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { trackEvent } from '../lib/tracking';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -153,8 +154,47 @@ const ProductDetail: React.FC = () => {
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : null;
 
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / reviews.length
+    : null;
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.subtitle || product.description || product.title,
+    image: galleryImages,
+    sku: String(product.id),
+    brand: { '@type': 'Brand', name: 'PatteStyle' },
+    offers: {
+      '@type': 'Offer',
+      url: `${window.location.origin}/product/${product.id}`,
+      priceCurrency: 'EUR',
+      price: product.price,
+      availability: product.stock_quantity > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition'
+    },
+    ...(avgRating && reviews.length > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: reviews.length
+      }
+    } : {})
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      <Seo
+        title={product.title}
+        description={product.subtitle || product.description || `${product.title} — disponible sur PatteStyle, livraison en Europe.`}
+        path={`/product/${product.id}`}
+        image={galleryImages[0]}
+        type="product"
+        jsonLd={productJsonLd}
+      />
       
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-stone-500">

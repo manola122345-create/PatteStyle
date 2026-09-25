@@ -55,3 +55,23 @@ git push -u origin main
 ## 5. Après déploiement
 - Teste la connexion admin avec ton `ADMIN_ACCESS_CODE`.
 - Vérifie qu'un visiteur non connecté ne peut pas accéder aux données clients ni modifier le catalogue (essaie d'appeler `/api/customers` ou de faire un POST sur `/api/products` sans être connecté : ça doit renvoyer une erreur 401).
+
+## 6. SEO : Google Search Console & Google Analytics
+
+**Google Search Console** (indexation, suivi des positions sur Google)
+1. Va sur [search.google.com/search-console](https://search.google.com/search-console), ajoute une propriété avec ton URL Vercel (ou ton domaine final).
+2. Choisis la méthode de vérification "Balise HTML" — Google te donne un code du type `content="abc123..."`.
+3. Ajoute une variable `VITE_GSC_VERIFICATION` sur Vercel avec juste cette valeur (sans les guillemets), redéploie, puis clique "Vérifier" sur Search Console.
+4. Une fois vérifié, va dans "Sitemaps" et soumets : `sitemap.xml`
+
+**Google Analytics 4** (statistiques de visite)
+1. Va sur [analytics.google.com](https://analytics.google.com), crée une propriété GA4 pour PatteStyle.
+2. Récupère ton "ID de mesure" (commence par `G-...`).
+3. Ajoute une variable `VITE_GA_MEASUREMENT_ID` sur Vercel avec cette valeur, redéploie.
+
+**Google Merchant Center** (listing gratuit sur Google Shopping — recommandé pour du e-commerce)
+1. Va sur [merchants.google.com](https://merchants.google.com), crée un compte pour PatteStyle.
+2. Dans "Produits" > "Flux", ajoute un flux avec l'URL : `https://ton-site.vercel.app/product-feed.xml`
+3. Merchant Center revalidera le flux automatiquement à intervalle régulier.
+
+Sans ces 3 variables/étapes, le site fonctionne normalement — le SEO technique (sitemap, robots.txt, balises meta, données structurées) est déjà actif par défaut.

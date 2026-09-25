@@ -1,8 +1,14 @@
 import React from 'react';
+import Seo from '../components/Seo';
 
 const Terms: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6 text-xs sm:text-sm text-stone-700">
+      <Seo
+        title="Conditions Générales de Vente"
+        description="Conditions générales de vente PatteStyle — livraison, paiement, droit de rétractation."
+        path="/terms"
+      />
       <h1 className="font-serif text-3xl font-bold text-stone-900 border-b border-stone-200 pb-4">
         Conditions Générales de Vente (CGV)
       </h1>

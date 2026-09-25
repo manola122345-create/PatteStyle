@@ -1,9 +1,15 @@
 import React from 'react';
 import { PawPrint, Heart, ShieldCheck, Truck, Users } from 'lucide-react';
+import Seo from '../components/Seo';
 
 const About: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <Seo
+        title="À propos"
+        description="Découvrez l'histoire de PatteStyle, boutique européenne dédiée aux accessoires premium pour chiens et chats."
+        path="/about"
+      />
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
           <PawPrint className="w-4 h-4" /> Notre Histoire

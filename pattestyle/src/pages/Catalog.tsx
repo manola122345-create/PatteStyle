@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, PawPrint, Filter, X, ArrowUpDown } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 import { trackEvent } from '../lib/tracking';
 
 const Catalog: React.FC = () => {
@@ -71,6 +72,11 @@ const Catalog: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <Seo
+        title={selectedCategory !== 'Tous' ? selectedCategory : selectedPet !== 'Tous' ? `Accessoires pour ${selectedPet}s` : 'Catalogue'}
+        description="Découvrez tous les accessoires PatteStyle pour chiens et chats : couchages, harnais, gamelles, jouets et plus. Livraison en Europe."
+        path={`/catalog${window.location.search}`}
+      />
       
       {/* Header Title */}
       <div className="bg-gradient-to-r from-amber-900 to-stone-900 text-white rounded-3xl p-8 shadow-xl space-y-3">

@@ -1,9 +1,15 @@
 import React from 'react';
 import { Truck, ShieldCheck } from 'lucide-react';
+import Seo from '../components/Seo';
 
 const ShippingReturns: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <Seo
+        title="Politique de Livraison"
+        description="Délais et tarifs de livraison PatteStyle en Europe : 1 à 7 jours ouvrables, livraison gratuite dès 49€."
+        path="/shipping-returns"
+      />
       <div className="border-b border-stone-200 pb-4">
         <h1 className="font-serif text-3xl font-bold text-stone-900">
           Politique de Livraison

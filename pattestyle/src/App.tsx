@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { CartProvider } from './contexts/CartContext';
 import { AdminProvider } from './contexts/AdminContext';
 
@@ -7,6 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import AdminPinModal from './components/AdminPinModal';
+import SiteHead from './components/SiteHead';
 
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
@@ -21,10 +23,12 @@ import Admin from './pages/Admin';
 
 const App: React.FC = () => {
   return (
+    <HelmetProvider>
     <AdminProvider>
       <CartProvider>
         <Router>
           <div className="min-h-screen bg-[#FFFDF9] text-stone-800 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-900">
+            <SiteHead />
             <Header />
             <CartDrawer />
             <AdminPinModal />
@@ -49,6 +53,7 @@ const App: React.FC = () => {
         </Router>
       </CartProvider>
     </AdminProvider>
+    </HelmetProvider>
   );
 };
 
