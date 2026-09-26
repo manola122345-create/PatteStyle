@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import supabase from './db-client.js';
+import supabase from './_db-client.js';
 
 export const config = {
   api: { bodyParser: false }

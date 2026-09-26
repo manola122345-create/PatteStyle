@@ -1,8 +1,8 @@
 {
   "rewrites": [
-    { "source": "/robots.txt", "destination": "/api/robots" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
-    { "source": "/product-feed.xml", "destination": "/api/product-feed.xml" },
+    { "source": "/robots.txt", "destination": "/api/seo?type=robots" },
+    { "source": "/sitemap.xml", "destination": "/api/seo?type=sitemap" },
+    { "source": "/product-feed.xml", "destination": "/api/seo?type=feed" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
