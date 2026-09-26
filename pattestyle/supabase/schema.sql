@@ -17,7 +17,7 @@ create table if not exists products (
   is_active boolean default true,
   is_featured boolean default false,
   is_best_seller boolean default false,
-  delivery_estimate text default 'Livraison 1 à 7 jours ouvrables en Europe',
+  delivery_estimate text default 'Livraison 1 à 14 jours en Europe',
   supplier_url text,
   specifications text default '',
   badge text,

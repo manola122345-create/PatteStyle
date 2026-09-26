@@ -21,6 +21,17 @@ const Home: React.FC = () => {
   const [bestSellers, setBestSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const CATEGORY_CONFIG: Record<string, { image: string; tag: string; label: string }> = {
+    'Couchage & Repos': { image: '/images/dog-bed-1.jpg', tag: 'Confort Absolu', label: 'Lits & Couchages' },
+    'Harnais & Laisses': { image: '/images/dog-harness.jpg', tag: 'Sécurité & Promenade', label: 'Harnais Ergonomiques' },
+    'Repas & Gamelles': { image: '/images/pet-bowl.jpg', tag: 'Céramique & Inox', label: 'Gamelles & Repas' },
+    'Jouets & Éveil': { image: '/images/pet-toy.jpg', tag: 'Anti-Ennui', label: 'Jouets & Éveil' },
+    'Soin & Grooming': { image: '/images/cat-bed.jpg', tag: 'Bien-être & Hygiène', label: 'Soin & Grooming' },
+    'Accessoires Auto & Transport': { image: '/images/pet-carrier.jpg', tag: 'Déplacements Sereins', label: 'Transport & Voyage' }
+  };
+  const DEFAULT_FEATURED = ['Couchage & Repos', 'Harnais & Laisses', 'Repas & Gamelles', 'Jouets & Éveil'];
+  const [featuredCategories, setFeaturedCategories] = useState<string[]>(DEFAULT_FEATURED);
+
   useEffect(() => {
     trackEvent('ViewContent', { page: 'Homepage' });
 
@@ -40,13 +51,27 @@ const Home: React.FC = () => {
     };
 
     fetchProducts();
+
+    const fetchFeaturedCategories = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data?.featured_categories) {
+          const parsed = JSON.parse(data.featured_categories);
+          if (Array.isArray(parsed) && parsed.length > 0) setFeaturedCategories(parsed);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchFeaturedCategories();
   }, []);
 
   return (
     <div className="space-y-16 pb-16">
       <Seo
         title="Accessoires Premium pour Chiens & Chats"
-        description="PatteStyle — accessoires premium pour chiens et chats en Europe : couchages orthopédiques, harnais, gamelles, jouets. Livraison 1 à 7 jours ouvrables."
+        description="PatteStyle — accessoires premium pour chiens et chats en Europe : couchages orthopédiques, harnais, gamelles, jouets. Livraison 1 à 14 jours."
         path="/"
       />
       
@@ -134,66 +159,28 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link
-            to={`/catalog?category=${encodeURIComponent('Couchage & Repos')}`}
-            className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
-          >
-            <img
-              src="/images/dog-bed-1.jpg"
-              alt="Couchage"
-              className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-500"
-            />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Confort Absolu</span>
-              <h3 className="font-bold text-lg leading-tight">Lits & Couchages</h3>
-            </div>
-          </Link>
-
-          <Link
-            to={`/catalog?category=${encodeURIComponent('Harnais & Laisses')}`}
-            className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
-          >
-            <img
-              src="/images/dog-harness.jpg"
-              alt="Harnais"
-              className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-500"
-            />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Sécurité & Promenade</span>
-              <h3 className="font-bold text-lg leading-tight">Harnais Ergonomiques</h3>
-            </div>
-          </Link>
-
-          <Link
-            to={`/catalog?category=${encodeURIComponent('Repas & Gamelles')}`}
-            className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
-          >
-            <img
-              src="/images/pet-bowl.jpg"
-              alt="Gamelles"
-              className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-500"
-            />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Céramique & Inox</span>
-              <h3 className="font-bold text-lg leading-tight">Gamelles & Repas</h3>
-            </div>
-          </Link>
-
-          <Link
-            to={`/catalog?category=${encodeURIComponent('Jouets & Éveil')}`}
-            className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
-          >
-            <img
-              src="/images/pet-toy.jpg"
-              alt="Jouets"
-              className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-500"
-            />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Anti-Ennui</span>
-              <h3 className="font-bold text-lg leading-tight">Jouets & Éveil</h3>
-            </div>
-          </Link>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {featuredCategories.map((cat) => {
+            const cfg = CATEGORY_CONFIG[cat];
+            if (!cfg) return null;
+            return (
+              <Link
+                key={cat}
+                to={`/catalog?category=${encodeURIComponent(cat)}`}
+                className="group relative h-48 rounded-2xl overflow-hidden shadow-md bg-stone-900 flex items-end p-4 text-white"
+              >
+                <img
+                  src={cfg.image}
+                  alt={cfg.label}
+                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-500"
+                />
+                <div className="relative z-10 space-y-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-300">{cfg.tag}</span>
+                  <h3 className="font-bold text-lg leading-tight">{cfg.label}</h3>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

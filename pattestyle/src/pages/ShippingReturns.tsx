@@ -7,7 +7,7 @@ const ShippingReturns: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <Seo
         title="Politique de Livraison"
-        description="Délais et tarifs de livraison PatteStyle en Europe : 1 à 7 jours ouvrables, livraison gratuite dès 49€."
+        description="Délais et tarifs de livraison PatteStyle en Europe : 1 à 14 jours, livraison gratuite dès 49€."
         path="/shipping-returns"
       />
       <div className="border-b border-stone-200 pb-4">
@@ -25,13 +25,14 @@ const ShippingReturns: React.FC = () => {
             <Truck className="w-5 h-5 text-amber-700" /> Zones & Tarifs de Livraison Europe
           </h3>
           <p>
-            Toutes nos commandes sont préparées et expédiées sous 24h à 48h ouvrées. Quel que soit le pays de livraison en Europe, le délai de livraison est de <strong>1 à 7 jours ouvrables</strong>. La livraison est <strong>GRATUITE</strong> pour toute commande supérieure à 49,00 €.
+            Toutes nos commandes sont préparées et expédiées sous 24h à 48h ouvrées. Quel que soit le pays de livraison en Europe, le délai de livraison est de <strong>1 à 14 jours</strong>. La livraison est <strong>GRATUITE</strong> pour toute commande supérieure à 49,00 €.
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong>France métropolitaine :</strong> 4,90 € (Gratuit dès 49€)</li>
+            <li><strong>France métropolitaine :</strong> 1,50 € (Gratuit dès 49€)</li>
             <li><strong>Belgique & Luxembourg :</strong> 4,90 € (Gratuit dès 49€)</li>
-            <li><strong>Suisse :</strong> 6,90 €</li>
-            <li><strong>Espagne, Allemagne, Italie, Pays-Bas :</strong> 5,90 €</li>
+            <li><strong>Espagne, Allemagne, Italie, Pays-Bas :</strong> 5,90 € (Gratuit dès 49€)</li>
+            <li><strong>Suisse & Portugal :</strong> 6,90 € (Gratuit dès 49€)</li>
+            <li><strong>Reste de l'Europe :</strong> 8,90 € (Gratuit dès 49€)</li>
           </ul>
         </section>
 

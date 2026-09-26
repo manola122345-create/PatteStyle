@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       items
     } = req.body || {};
 
-    if (!customer_email || !customer_name || !items || items.length === 0) {
+    if (!customer_email || !customer_name || !customer_phone || !items || items.length === 0) {
       return res.status(400).json({ error: 'Informations de commande incomplètes' });
     }
 

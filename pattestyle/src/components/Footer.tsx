@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
             </div>
             <h4 className="font-semibold text-white">Livraison Europe</h4>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Livraison sous 1 à 7 jours ouvrables avec numéro de suivi, partout en Europe (France, Belgique, Suisse, etc.).
+              Livraison sous 1 à 14 jours avec numéro de suivi, partout en Europe (France, Belgique, Suisse, etc.).
             </p>
           </div>
 

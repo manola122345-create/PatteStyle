@@ -14,7 +14,7 @@ import { useCart } from '../contexts/CartContext';
 import { trackEvent } from '../lib/tracking';
 
 const EuropeanCountries = [
-  { code: 'FR', name: 'France', flag: '🇫🇷', fee: 0.00 },
+  { code: 'FR', name: 'France', flag: '🇫🇷', fee: 1.50 },
   { code: 'BE', name: 'Belgique', flag: '🇧🇪', fee: 4.90 },
   { code: 'CH', name: 'Suisse', flag: '🇨🇭', fee: 6.90 },
   { code: 'LU', name: 'Luxembourg', flag: '🇱🇺', fee: 4.90 },
@@ -172,9 +172,10 @@ const Checkout: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">Téléphone (pour le livreur)</label>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">Téléphone (pour le livreur) *</label>
                     <input
                       type="tel"
+                      required
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="+33 6 12 34 56 78"
@@ -346,7 +347,7 @@ const Checkout: React.FC = () => {
 
             <div className="p-3 bg-white rounded-xl border border-stone-200 text-[11px] text-stone-600 space-y-1">
               <span className="font-bold text-stone-900 block">🚚 Informations d'expédition :</span>
-              <p>Livré par Colissimo / Chronopost Europe sous 1 à 7 jours ouvrables.</p>
+              <p>Livré par Colissimo / Chronopost Europe sous 1 à 14 jours.</p>
             </div>
           </div>
         </div>

@@ -15,7 +15,8 @@ import {
   Eye,
   RefreshCw,
   Search,
-  CheckCircle2
+  CheckCircle2,
+  PawPrint
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -101,27 +102,68 @@ const Admin: React.FC = () => {
   const [tiktokPixel, setTiktokPixel] = useState(localStorage.getItem('pattestyle_tiktok_pixel') || 'TT-7749201');
   const [pixelSaved, setPixelSaved] = useState(false);
 
+  const ALL_CATEGORIES = [
+    'Couchage & Repos',
+    'Harnais & Laisses',
+    'Jouets & Éveil',
+    'Soin & Grooming',
+    'Repas & Gamelles',
+    'Accessoires Auto & Transport'
+  ];
+  const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
+  const [categoriesSaved, setCategoriesSaved] = useState(false);
+
   const fetchAllData = async () => {
     setLoading(true);
     try {
       const authHeaders = { Authorization: `Bearer ${adminToken}` };
-      const [pRes, oRes, cRes] = await Promise.all([
+      const [pRes, oRes, cRes, sRes] = await Promise.all([
         fetch('/api/products'),
         fetch('/api/orders', { headers: authHeaders }),
-        fetch('/api/customers', { headers: authHeaders })
+        fetch('/api/customers', { headers: authHeaders }),
+        fetch('/api/settings')
       ]);
 
       const pData = await pRes.json();
       const oData = await oRes.json();
       const cData = await cRes.json();
+      const sData = await sRes.json();
 
       setProducts(Array.isArray(pData) ? pData : []);
       setOrders(Array.isArray(oData) ? oData : []);
       setCustomers(Array.isArray(cData) ? cData : []);
+      try {
+        const parsed = sData?.featured_categories ? JSON.parse(sData.featured_categories) : [];
+        setFeaturedCategories(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setFeaturedCategories([]);
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleFeaturedCategory = (cat: string) => {
+    setFeaturedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  };
+
+  const saveFeaturedCategories = async () => {
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ key: 'featured_categories', value: JSON.stringify(featuredCategories) })
+      });
+      if (res.ok) {
+        setCategoriesSaved(true);
+        setTimeout(() => setCategoriesSaved(false), 3000);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -629,6 +671,47 @@ const Admin: React.FC = () => {
               </p>
             )}
           </div>
+        </div>
+      )}
+
+      {activeTab === 'marketing' && (
+        <div className="space-y-6 max-w-2xl bg-white p-6 rounded-2xl border border-stone-200 shadow-xs mt-6">
+          <h3 className="font-bold text-stone-900 text-lg flex items-center gap-2">
+            <PawPrint className="w-5 h-5 text-amber-700" /> Catégories Phares (Page d'Accueil)
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed">
+            Choisis quelles catégories apparaissent en vedette sur la page d'accueil du site.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {ALL_CATEGORIES.map((cat) => (
+              <label
+                key={cat}
+                className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-medium text-stone-700 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={featuredCategories.includes(cat)}
+                  onChange={() => toggleFeaturedCategory(cat)}
+                  className="rounded text-amber-700 focus:ring-amber-500 accent-amber-700 w-4 h-4"
+                />
+                {cat}
+              </label>
+            ))}
+          </div>
+
+          <button
+            onClick={saveFeaturedCategories}
+            className="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl transition flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="w-4 h-4" /> Enregistrer les Catégories Phares
+          </button>
+
+          {categoriesSaved && (
+            <p className="text-xs text-emerald-600 font-semibold">
+              ✓ Catégories phares mises à jour.
+            </p>
+          )}
         </div>
       )}
 
