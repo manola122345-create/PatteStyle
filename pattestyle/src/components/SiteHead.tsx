@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 
 const GA_ID = (import.meta as any).env?.VITE_GA_MEASUREMENT_ID as string | undefined;
-const GSC_VERIFICATION = (import.meta as any).env?.VITE_GSC_VERIFICATION as string | undefined;
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -16,12 +16,19 @@ const organizationJsonLd = {
 };
 
 const SiteHead: React.FC = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!GA_ID || typeof (window as any).gtag !== 'function') return;
+    (window as any).gtag('event', 'page_view', {
+      page_path: location.pathname + location.search,
+      page_location: window.location.href,
+      page_title: document.title
+    });
+  }, [location.pathname, location.search]);
+
   return (
     <Helmet>
-      {GSC_VERIFICATION && (
-        <meta name="google-site-verification" content={GSC_VERIFICATION} />
-      )}
-
       <script type="application/ld+json">
         {JSON.stringify(organizationJsonLd)}
       </script>
@@ -34,7 +41,7 @@ const SiteHead: React.FC = () => {
           {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
+gtag('config', '${GA_ID}', { send_page_view: false });`}
         </script>
       )}
     </Helmet>
