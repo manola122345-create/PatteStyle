@@ -16,7 +16,8 @@ import {
   RefreshCw,
   Search,
   CheckCircle2,
-  PawPrint
+  PawPrint,
+  Star
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -47,7 +48,7 @@ const Admin: React.FC = () => {
   const [pSpecifications, setPSpecifications] = useState('');
   const [pColors, setPColors] = useState('');
   const [pSizes, setPSizes] = useState('');
-  const [pIsFeatured, setPIsFeatured] = useState(true);
+  const [pIsFeatured, setPIsFeatured] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
@@ -301,7 +302,7 @@ const Admin: React.FC = () => {
     setPSpecifications('');
     setPColors('');
     setPSizes('');
-    setPIsFeatured(true);
+    setPIsFeatured(false);
   };
 
   const openEditProduct = (prod: any) => {
@@ -498,7 +499,12 @@ const Admin: React.FC = () => {
                       <td className="p-3 flex items-center gap-3">
                         <img src={img} alt="" className="w-10 h-10 object-cover rounded-lg bg-stone-100 shrink-0" />
                         <div>
-                          <span className="font-bold text-stone-900 block">{prod.title}</span>
+                          <span className="font-bold text-stone-900 flex items-center gap-1.5">
+                            {prod.title}
+                            {prod.is_featured && (
+                              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            )}
+                          </span>
                           <span className="text-[10px] text-stone-400">{prod.badge || 'Standard'}</span>
                         </div>
                       </td>
@@ -927,6 +933,21 @@ const Admin: React.FC = () => {
                   onChange={(e) => setPDescription(e.target.value)}
                   className="w-full bg-stone-50 border border-stone-300 rounded-xl p-3"
                 />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <label className="flex items-center gap-2 cursor-pointer font-semibold text-stone-800">
+                  <input
+                    type="checkbox"
+                    checked={pIsFeatured}
+                    onChange={(e) => setPIsFeatured(e.target.checked)}
+                    className="rounded text-amber-700 focus:ring-amber-500 accent-amber-700 w-4 h-4"
+                  />
+                  Produit Vedette (affiché en avant sur la page d'accueil)
+                </label>
+                <p className="text-[11px] text-stone-500 mt-1 ml-6">
+                  Décoche pour la plupart de tes produits — seuls quelques-uns doivent être en vedette à la fois.
+                </p>
               </div>
 
               <div className="flex gap-2 pt-2">
