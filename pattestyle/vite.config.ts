@@ -24,10 +24,12 @@ export default defineConfig(async ({ mode }) => {
   plugins.push({
     name: 'html-env-placeholders',
     transformIndexHtml(html: string) {
-      return html.replace(
-        '__GSC_VERIFICATION__',
-        env.VITE_GSC_VERIFICATION || process.env.VITE_GSC_VERIFICATION || ''
-      );
+      const raw = env.VITE_GSC_VERIFICATION || process.env.VITE_GSC_VERIFICATION || '';
+      // Tolérance : si la balise <meta ... content="CODE" /> entière a été collée,
+      // on n'en garde que CODE.
+      const match = raw.match(/content=["']([^"']+)["']/);
+      const code = (match ? match[1] : raw).trim().replace(/^["']|["']$/g, '');
+      return html.replace('__GSC_VERIFICATION__', () => code);
     }
   });
 
