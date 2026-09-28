@@ -29,7 +29,26 @@ export default defineConfig(async ({ mode }) => {
       // on n'en garde que CODE.
       const match = raw.match(/content=["']([^"']+)["']/);
       const code = (match ? match[1] : raw).trim().replace(/^["']|["']$/g, '');
-      return html.replace('__GSC_VERIFICATION__', () => code);
+
+      // Google Analytics 4 : on extrait l'ID (G-XXXXXXXXXX) même si un extrait
+      // de code entier a été collé, puis on écrit le snippet en dur dans le HTML
+      // (visible immédiatement par les navigateurs et par l'outil de vérification Google).
+      const rawGa = env.VITE_GA_MEASUREMENT_ID || process.env.VITE_GA_MEASUREMENT_ID || '';
+      const gaMatch = rawGa.match(/G-[A-Z0-9]+/i);
+      const gaId = gaMatch ? gaMatch[0].toUpperCase() : '';
+      const gaSnippet = gaId
+        ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${gaId}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${gaId}', { send_page_view: false });
+    </script>`
+        : '';
+
+      return html
+        .replace('__GSC_VERIFICATION__', () => code)
+        .replace('<!--GA_SNIPPET-->', () => gaSnippet);
     }
   });
 

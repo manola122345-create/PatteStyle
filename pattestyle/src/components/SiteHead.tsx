@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 
-const GA_ID = (import.meta as any).env?.VITE_GA_MEASUREMENT_ID as string | undefined;
-
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'OnlineStore',
@@ -18,8 +16,11 @@ const organizationJsonLd = {
 const SiteHead: React.FC = () => {
   const location = useLocation();
 
+  // Google Analytics 4 est chargé directement dans index.html (uniquement si
+  // VITE_GA_MEASUREMENT_ID est défini). Sur un site SPA, on envoie ici une vue
+  // de page à chaque changement de route, y compris pour la toute première page.
   useEffect(() => {
-    if (!GA_ID || typeof (window as any).gtag !== 'function') return;
+    if (typeof (window as any).gtag !== 'function') return;
     (window as any).gtag('event', 'page_view', {
       page_path: location.pathname + location.search,
       page_location: window.location.href,
@@ -32,18 +33,6 @@ const SiteHead: React.FC = () => {
       <script type="application/ld+json">
         {JSON.stringify(organizationJsonLd)}
       </script>
-
-      {GA_ID && (
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-      )}
-      {GA_ID && (
-        <script>
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}', { send_page_view: false });`}
-        </script>
-      )}
     </Helmet>
   );
 };
