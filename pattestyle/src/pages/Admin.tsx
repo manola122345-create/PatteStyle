@@ -99,8 +99,8 @@ const Admin: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   // Pixel Settings State
-  const [metaPixel, setMetaPixel] = useState(localStorage.getItem('pattestyle_meta_pixel') || 'FB-98421054');
-  const [tiktokPixel, setTiktokPixel] = useState(localStorage.getItem('pattestyle_tiktok_pixel') || 'TT-7749201');
+  const [metaPixel, setMetaPixel] = useState('');
+  const [tiktokPixel, setTiktokPixel] = useState('');
   const [pixelSaved, setPixelSaved] = useState(false);
 
   const ALL_CATEGORIES = [
@@ -139,6 +139,8 @@ const Admin: React.FC = () => {
       } catch {
         setFeaturedCategories([]);
       }
+      setMetaPixel(sData?.meta_pixel_id || '');
+      setTiktokPixel(sData?.tiktok_pixel_id || '');
     } catch (err) {
       console.error(err);
     } finally {
@@ -629,7 +631,7 @@ const Admin: React.FC = () => {
           </h3>
 
           <p className="text-xs text-stone-600 leading-relaxed">
-            Renseignez vos identifiants de pixels de suivi publicitaire. Tous les événements clés (ViewContent, AddToCart, InitiateCheckout, Purchase) seront immédiatement retransmis.
+            Renseigne tes vrais identifiants de pixels (depuis Meta Events Manager / TikTok Ads Manager). Ils sont actifs pour tous les visiteurs du site dès l'enregistrement — tous les événements clés (ViewContent, AddToCart, InitiateCheckout, Purchase) sont retransmis automatiquement.
           </p>
 
           <div className="space-y-4 pt-2">
@@ -641,7 +643,7 @@ const Admin: React.FC = () => {
                 type="text"
                 value={metaPixel}
                 onChange={(e) => setMetaPixel(e.target.value)}
-                placeholder="ex: FB-98421054"
+                placeholder="ex: 1234567890123456 (numérique, depuis Events Manager)"
                 className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-900"
               />
             </div>
@@ -654,17 +656,22 @@ const Admin: React.FC = () => {
                 type="text"
                 value={tiktokPixel}
                 onChange={(e) => setTiktokPixel(e.target.value)}
-                placeholder="ex: TT-7749201"
+                placeholder="ex: C4A1B2C3D4E5F6 (depuis TikTok Ads Manager)"
                 className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-900"
               />
             </div>
 
             <button
-              onClick={() => {
-                localStorage.setItem('pattestyle_meta_pixel', metaPixel);
-                localStorage.setItem('pattestyle_tiktok_pixel', tiktokPixel);
-                setPixelSaved(true);
-                setTimeout(() => setPixelSaved(false), 3000);
+              onClick={async () => {
+                try {
+                  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` };
+                  await fetch('/api/settings', { method: 'POST', headers, body: JSON.stringify({ key: 'meta_pixel_id', value: metaPixel }) });
+                  await fetch('/api/settings', { method: 'POST', headers, body: JSON.stringify({ key: 'tiktok_pixel_id', value: tiktokPixel }) });
+                  setPixelSaved(true);
+                  setTimeout(() => setPixelSaved(false), 3000);
+                } catch (err) {
+                  console.error(err);
+                }
               }}
               className="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl transition flex items-center gap-1.5"
             >
@@ -673,7 +680,7 @@ const Admin: React.FC = () => {
 
             {pixelSaved && (
               <p className="text-xs text-emerald-600 font-semibold">
-                ✓ Pixels configurés et prêts à l'emploi.
+                ✓ Pixels configurés et actifs sur le site.
               </p>
             )}
           </div>
