@@ -39,11 +39,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [isOpen, setIsOpen] = useState(false);
-  const freeShippingThreshold = 49.00;
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(49.00);
 
   useEffect(() => {
     localStorage.setItem('pattestyle_cart', JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        const val = parseFloat(data?.free_shipping_threshold);
+        if (!isNaN(val) && val >= 0) setFreeShippingThreshold(val);
+      })
+      .catch((err) => console.error('Erreur chargement seuil livraison gratuite:', err));
+  }, []);
 
   const addToCart = (product: any, selectedColor?: string, selectedSize?: string, quantity: number = 1) => {
     const image = Array.isArray(product.images) && product.images.length > 0 

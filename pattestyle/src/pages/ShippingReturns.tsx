@@ -1,13 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Truck, ShieldCheck } from 'lucide-react';
 import Seo from '../components/Seo';
 
+const DEFAULT_FEES: Record<string, number> = {
+  France: 1.50, Belgique: 4.90, Luxembourg: 4.90, Suisse: 6.90,
+  Espagne: 5.90, Allemagne: 5.90, Italie: 5.90, 'Pays-Bas': 5.90,
+  Portugal: 6.90, "Reste de l'Europe": 8.90
+};
+
 const ShippingReturns: React.FC = () => {
+  const [fees, setFees] = useState<Record<string, number>>(DEFAULT_FEES);
+  const [threshold, setThreshold] = useState(49);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.shipping_fees) {
+          try {
+            setFees({ ...DEFAULT_FEES, ...JSON.parse(data.shipping_fees) });
+          } catch {}
+        }
+        const t = parseFloat(data?.free_shipping_threshold);
+        if (!isNaN(t)) setThreshold(t);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <Seo
         title="Politique de Livraison"
-        description="Délais et tarifs de livraison PatteStyle en Europe : 1 à 14 jours, livraison gratuite dès 49€."
+        description={`Délais et tarifs de livraison PatteStyle en Europe : 1 à 14 jours, livraison gratuite dès ${threshold}€.`}
         path="/shipping-returns"
       />
       <div className="border-b border-stone-200 pb-4">
@@ -25,14 +49,14 @@ const ShippingReturns: React.FC = () => {
             <Truck className="w-5 h-5 text-amber-700" /> Zones & Tarifs de Livraison Europe
           </h3>
           <p>
-            Toutes nos commandes sont préparées et expédiées sous 24h à 48h ouvrées. Quel que soit le pays de livraison en Europe, le délai de livraison est de <strong>1 à 14 jours</strong>. La livraison est <strong>GRATUITE</strong> pour toute commande supérieure à 49,00 €.
+            Toutes nos commandes sont préparées et expédiées sous 24h à 48h ouvrées. Quel que soit le pays de livraison en Europe, le délai de livraison est de <strong>1 à 14 jours</strong>. La livraison est <strong>GRATUITE</strong> pour toute commande supérieure à {threshold.toFixed(2)} €.
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong>France métropolitaine :</strong> 1,50 € (Gratuit dès 49€)</li>
-            <li><strong>Belgique & Luxembourg :</strong> 4,90 € (Gratuit dès 49€)</li>
-            <li><strong>Espagne, Allemagne, Italie, Pays-Bas :</strong> 5,90 € (Gratuit dès 49€)</li>
-            <li><strong>Suisse & Portugal :</strong> 6,90 € (Gratuit dès 49€)</li>
-            <li><strong>Reste de l'Europe :</strong> 8,90 € (Gratuit dès 49€)</li>
+            {Object.entries(fees).map(([country, fee]) => (
+              <li key={country}>
+                <strong>{country} :</strong> {fee.toFixed(2)} € (Gratuit dès {threshold.toFixed(2)}€)
+              </li>
+            ))}
           </ul>
         </section>
 

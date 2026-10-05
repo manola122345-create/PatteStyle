@@ -13,7 +13,7 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { trackEvent } from '../lib/tracking';
 
-const EuropeanCountries = [
+const DEFAULT_COUNTRIES = [
   { code: 'FR', name: 'France', flag: '🇫🇷', fee: 1.50 },
   { code: 'BE', name: 'Belgique', flag: '🇧🇪', fee: 4.90 },
   { code: 'CH', name: 'Suisse', flag: '🇨🇭', fee: 6.90 },
@@ -29,6 +29,23 @@ const EuropeanCountries = [
 const Checkout: React.FC = () => {
   const { cart, subtotal, clearCart, freeShippingThreshold } = useCart();
   const navigate = useNavigate();
+
+  const [EuropeanCountries, setEuropeanCountries] = useState(DEFAULT_COUNTRIES);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data?.shipping_fees) return;
+        const overrides = JSON.parse(data.shipping_fees);
+        setEuropeanCountries(
+          DEFAULT_COUNTRIES.map((c) =>
+            overrides[c.name] != null ? { ...c, fee: parseFloat(overrides[c.name]) } : c
+          )
+        );
+      })
+      .catch((err) => console.error('Erreur chargement frais de livraison:', err));
+  }, []);
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [submitting, setSubmitting] = useState(false);

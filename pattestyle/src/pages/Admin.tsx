@@ -103,6 +103,16 @@ const Admin: React.FC = () => {
   const [tiktokPixel, setTiktokPixel] = useState('');
   const [pixelSaved, setPixelSaved] = useState(false);
 
+  const SHIPPING_COUNTRIES = ['France', 'Belgique', 'Suisse', 'Luxembourg', 'Espagne', 'Allemagne', 'Italie', 'Pays-Bas', 'Portugal', "Reste de l'Europe"];
+  const DEFAULT_SHIPPING_FEES: Record<string, number> = {
+    France: 1.50, Belgique: 4.90, Suisse: 6.90, Luxembourg: 4.90,
+    Espagne: 5.90, Allemagne: 5.90, Italie: 5.90, 'Pays-Bas': 5.90,
+    Portugal: 6.90, "Reste de l'Europe": 8.90
+  };
+  const [shippingFees, setShippingFees] = useState<Record<string, number>>(DEFAULT_SHIPPING_FEES);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState('49');
+  const [shippingSaved, setShippingSaved] = useState(false);
+
   const ALL_CATEGORIES = [
     'Couchage & Repos',
     'Harnais & Laisses',
@@ -141,6 +151,13 @@ const Admin: React.FC = () => {
       }
       setMetaPixel(sData?.meta_pixel_id || '');
       setTiktokPixel(sData?.tiktok_pixel_id || '');
+      try {
+        const fees = sData?.shipping_fees ? JSON.parse(sData.shipping_fees) : {};
+        setShippingFees({ ...DEFAULT_SHIPPING_FEES, ...fees });
+      } catch {
+        setShippingFees(DEFAULT_SHIPPING_FEES);
+      }
+      if (sData?.free_shipping_threshold) setFreeShippingThreshold(String(sData.free_shipping_threshold));
     } catch (err) {
       console.error(err);
     } finally {
@@ -723,6 +740,73 @@ const Admin: React.FC = () => {
           {categoriesSaved && (
             <p className="text-xs text-emerald-600 font-semibold">
               ✓ Catégories phares mises à jour.
+            </p>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'marketing' && (
+        <div className="space-y-6 max-w-2xl bg-white p-6 rounded-2xl border border-stone-200 shadow-xs mt-6">
+          <h3 className="font-bold text-stone-900 text-lg flex items-center gap-2">
+            <Truck className="w-5 h-5 text-amber-700" /> Frais de Livraison
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed">
+            Modifie le montant facturé au client pour chaque zone de livraison, et le seuil à partir duquel la livraison devient gratuite.
+          </p>
+
+          <div>
+            <label className="block text-xs font-semibold text-stone-700 mb-1">
+              Livraison gratuite à partir de (€)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={freeShippingThreshold}
+              onChange={(e) => setFreeShippingThreshold(e.target.value)}
+              className="w-full sm:w-48 bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {SHIPPING_COUNTRIES.map((country) => (
+              <div key={country}>
+                <label className="block text-[11px] font-semibold text-stone-700 mb-1">{country}</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={shippingFees[country] ?? 0}
+                    onChange={(e) => setShippingFees((prev) => ({ ...prev, [country]: parseFloat(e.target.value) || 0 }))}
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl pl-3 pr-7 py-2 text-xs font-mono"
+                  />
+                  <span className="absolute right-3 top-2 text-stone-400 text-xs">€</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={async () => {
+              try {
+                const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` };
+                await fetch('/api/settings', { method: 'POST', headers, body: JSON.stringify({ key: 'shipping_fees', value: JSON.stringify(shippingFees) }) });
+                await fetch('/api/settings', { method: 'POST', headers, body: JSON.stringify({ key: 'free_shipping_threshold', value: freeShippingThreshold }) });
+                setShippingSaved(true);
+                setTimeout(() => setShippingSaved(false), 3000);
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+            className="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl transition flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="w-4 h-4" /> Enregistrer les Frais de Livraison
+          </button>
+
+          {shippingSaved && (
+            <p className="text-xs text-emerald-600 font-semibold">
+              ✓ Frais de livraison mis à jour sur le site.
             </p>
           )}
         </div>
