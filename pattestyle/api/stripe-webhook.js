@@ -1,19 +1,6 @@
 import Stripe from 'stripe';
 import supabase from './_db-client.js';
 
-export const config = {
-  api: { bodyParser: false }
-};
-
-function buffer(readable) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    readable.on('data', (chunk) => chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk));
-    readable.on('end', () => resolve(Buffer.concat(chunks)));
-    readable.on('error', reject);
-  });
-}
-
 async function sendOrderNotificationEmail(order) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY absent : pas de notification email envoyée.');
@@ -44,23 +31,26 @@ async function sendOrderNotificationEmail(order) {
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
-
+// Handler au format Web API (Request/Response) de Vercel : c'est la méthode
+// fiable pour récupérer le corps brut de la requête, nécessaire pour vérifier
+// la signature Stripe. L'ancienne méthode (req, res) + "bodyParser: false"
+// ne fonctionne de façon garantie que dans un projet Next.js — ce qui n'est
+// pas le cas ici, et empêchait la vérification de passer.
+export async function POST(request) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     console.error('Stripe non configuré côté serveur (clé secrète ou secret webhook manquant)');
-    return res.status(500).send('Stripe non configuré');
+    return new Response('Stripe non configuré', { status: 500 });
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   let event;
   try {
-    const buf = await buffer(req);
-    const sig = req.headers['stripe-signature'];
-    event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    const rawBody = await request.text();
+    const sig = request.headers.get('stripe-signature');
+    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     console.error('Signature webhook Stripe invalide:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
   try {
@@ -110,13 +100,17 @@ export default async function handler(req, res) {
           } catch (custErr) {
             console.warn('Customer update non-blocking error:', custErr);
           }
+        } else if (error) {
+          console.error('Erreur mise à jour commande:', error);
         }
+      } else {
+        console.warn('Webhook checkout.session.completed sans order_id en metadata');
       }
     }
 
-    return res.status(200).json({ received: true });
+    return Response.json({ received: true });
   } catch (err) {
     console.error('Erreur traitement webhook Stripe:', err);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    return new Response(JSON.stringify({ error: 'Erreur serveur' }), { status: 500 });
   }
 }
